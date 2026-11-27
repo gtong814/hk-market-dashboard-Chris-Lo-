@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HK Market Breadth & HSI Dashboard</title>
+  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    :root {
+      --bg: #131722;
+      --panel: #1e222d;
+      --border: #2a2e39;
+      --text: #d1d4dc;
+      --muted: #787b86;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 12px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .title { font-size: 16px; font-weight: 700; }
+    .price-up { color: #26a69a; }
+    .price-down { color: #ef5350; }
+    .meta { font-size: 12px; color: var(--muted); }
+    .chart-wrapper {
+      position: relative;
+      height: 58vh;
+      min-height: 400px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    #chart { width: 100%; height: 100%; }
+    .ma-overlay {
+      position: absolute;
+      top: 12px;
+      right: 76px;
+      z-index: 10;
+      background: rgba(19, 23, 34, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 12px;
+      backdrop-filter: blur(4px);
+    }
+    .grid-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 900px) {
+      .grid-bottom { grid-template-columns: 1fr; }
+      .ma-overlay { position: static; margin: 8px; }
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      overflow-x: auto;
+    }
+    .card h2 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #fff;
+      border-left: 3px solid #2962ff;
+      padding-left: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: center;
+    }
+    th, td {
+      padding: 7px 8px;
+      border: 1px solid var(--border);
+    }
+    th {
+      background: #252936;
+      color: #b2b5be;
+      font-weight: 600;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 12px;
+      color: #fff;
+    }
+    .st-Leading { background: #1b8a5a; }
+    .st-Improving { background: #1e6fd9; }
+    .st-Weakening { background: #d9822b; }
+    .st-Lagging { background: #c93b3b; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <span class="title">HSI 恒生指數 · 1D</span>
+      <span id="hsi-stats" style="margin-left: 12px; font-weight: 600;">載入中...</span>
+    </div>
+    <div class="meta">最後更新：<span id="updated-at">--</span></div>
+  </div>
+
+  <div class="chart-wrapper">
+    <div id="chart"></div>
+    <div class="ma-overlay">
+      <div style="font-weight: 700; margin-bottom: 6px; color: #fff;">MA Stability</div>
+      <table id="ma-table">
+        <thead>
+          <tr><th>均線</th><th>數值</th><th>趨勢</th><th>位置</th><th>乖離</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-bottom">
+    <div class="card">
+      <h2>HK Breadth 市場寬度 (% 高於均線)</h2>
+      <table id="breadth-table">
+        <thead>
+          <tr><th>板塊</th><th>> MA20</th><th>> MA50</th><th>> MA100</th><th>> MA200</th><th>成分數</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>板塊輪動與強弱狀態</h2>
+      <table id="rotation-table">
+        <thead>
+          <tr><th>板塊</th><th>狀態</th><th>1日變動</th><th>5日變動</th><th>20日變動</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function heatColor(pct) {
+      if (pct >= 70) return 'background: rgba(38, 166, 154, 0.45); color: #fff;';
+      if (pct >= 50) return 'background: rgba(38, 166, 154, 0.22);';
+      if (pct >= 30) return 'background: rgba(239, 83, 80, 0.28);';
+      return 'background: rgba(239, 83, 80, 0.55); color: #fff;';
+    }
+
+    async function init() {
+      const res = await fetch('./data.json?t=' + Date.now());
+      const data = await res.json();
+
+      // Header 數據
+      document.getElementById('updated-at').textContent = data.updated_at;
+      const isUp = data.hsi.chg_pts >= 0;
+      const sign = isUp ? '+' : '';
+      const statsEl = document.getElementById('hsi-stats');
+      statsEl.className = isUp ? 'price-up' : 'price-down';
+      statsEl.textContent = `${data.hsi.close.toLocaleString()} (${sign}${data.hsi.chg_pts} / ${sign}${data.hsi.chg_pct}%)`;
+
+      // 初始化 Lightweight Charts
+      const chartEl = document.getElementById('chart');
+      const chart = LightweightCharts.createChart(chartEl, {
+        layout: { background: { color: '#131722' }, textColor: '#d1d4dc' },
+        grid: { vertLines: { color: '#1f2430' }, horzLines: { color: '#1f2430' } },
+        timeScale: { borderColor: '#2a2e39' },
+        rightPriceScale: { borderColor: '#2a2e39' },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+      });
+
+      const candleSeries = chart.addCandlestickSeries({
+        upColor: '#26a69a', downColor: '#ef5350',
+        borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+      });
+      candleSeries.setData(data.hsi.candles);
+
+      const addMA = (seriesData, color) => {
+        const line = chart.addLineSeries({ color, lineWidth: 1.5, priceLineVisible: false });
+        line.setData(seriesData);
+      };
+      addMA(data.hsi.ma20, '#00bcd4');  // 青色 MA20
+      addMA(data.hsi.ma50, '#2962ff');  // 藍色 MA50
+      addMA(data.hsi.ma200, '#ff9800'); // 橙色 MA200
+
+      chart.timeScale().fitContent();
+      window.addEventListener('resize', () => {
+        chart.applyOptions({ width: chartEl.clientWidth, height: chartEl.clientHeight });
+      });
+
+      // 渲染 MA Stability 表
+      const maTbody = document.querySelector('#ma-table tbody');
+      maTbody.innerHTML = data.ma_table.map(r => `
+        <tr>
+          <td>${r.period}</td>
+          <td>${r.value.toLocaleString()}</td>
+          <td class="${r.trend === '向上' ? 'price-up' : 'price-down'}">${r.trend}</td>
+          <td class="${r.diff_pct >= 0 ? 'price-up' : 'price-down'}">${r.status}</td>
+          <td class="${r.diff_pct >= 0 ? 'price-up' : 'price-down'}">${r.diff_pct > 0 ? '+' : ''}${r.diff_pct}%</td>
+        </tr>
+      `).join('');
+
+      // 渲染 HK Breadth 熱力圖表
+      const breadthTbody = document.querySelector('#breadth-table tbody');
+      breadthTbody.innerHTML = data.breadth.map(r => `
+        <tr>
+          <td style="font-weight:600; text-align:left;">${r.name}</td>
+          <td style="${heatColor(r.ma20)}">${r.ma20}%</td>
+          <td style="${heatColor(r.ma50)}">${r.ma50}%</td>
+          <td style="${heatColor(r.ma100)}">${r.ma100}%</td>
+          <td style="${heatColor(r.ma200)}">${r.ma200}%</td>
+          <td style="color:#787b86;">${r.count}</td>
+        </tr>
+      `).join('');
+
+      // 渲染板塊輪動表
+      const rotTbody = document.querySelector('#rotation-table tbody');
+      rotTbody.innerHTML = data.rotation.map(r => `
+        <tr>
+          <td style="font-weight:600; text-align:left;">${r.name}</td>
+          <td><span class="badge st-${r.status}">${r.status}</span></td>
+          <td class="${r.chg_1d >= 0 ? 'price-up' : 'price-down'}">${r.chg_1d > 0 ? '+' : ''}${r.chg_1d}%</td>
+          <td class="${r.chg_5d >= 0 ? 'price-up' : 'price-down'}">${r.chg_5d > 0 ? '+' : ''}${r.chg_5d}%</td>
+          <td class="${r.chg_20d >= 0 ? 'price-up' : 'price-down'}">${r.chg_20d > 0 ? '+' : ''}${r.chg_20d}%</td>
+        </tr>
+      `).join('');
+    }
+
+    init();
+  </script>
+</body>
+</html>
