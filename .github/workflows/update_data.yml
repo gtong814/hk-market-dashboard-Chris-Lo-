@@ -2,9 +2,9 @@ name: Update HK Market Dashboard Data
 
 on:
   schedule:
-    - cron: '37 8 * * 1-5' # 週一至週五 16:30 HKT
-  workflow_dispatch:       # 允許在 GitHub 頁面手動觸發測試
-
+    - cron: '37 8 * * 1-5' # 週一至週五 16:37 HKT（避開半點塞車）
+    - cron: '7 9 * * 1-5'  # 週一至週五 17:07 HKT（雙重保險）
+  workflow_dispatch:
 permissions:
   contents: write
 
