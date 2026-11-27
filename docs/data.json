@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-11-27 16:45 HKT",
+  "updated_at": "2026-11-28 02:51 HKT",
   "hsi": {
-    "close": 22694.77,
-    "chg_pts": 467.89,
-    "chg_pct": 2.11,
+    "close": 22226.88,
+    "chg_pts": 260.87,
+    "chg_pct": 1.19,
     "candles": [
       {
         "time": "2024-11-27",
@@ -3448,13 +3448,6 @@
         "high": 22543.75,
         "low": 22217.01,
         "close": 22226.88
-      },
-      {
-        "time": "2026-11-27",
-        "open": 22263.7,
-        "high": 22781.03,
-        "low": 22263.7,
-        "close": 22694.77
       }
     ],
     "ma20": [
@@ -5349,10 +5342,6 @@
       {
         "time": "2026-11-26",
         "value": 23449.28
-      },
-      {
-        "time": "2026-11-27",
-        "value": 23419.3
       }
     ],
     "ma50": [
@@ -7127,10 +7116,6 @@
       {
         "time": "2026-11-26",
         "value": 23850.5
-      },
-      {
-        "time": "2026-11-27",
-        "value": 23810.12
       }
     ],
     "ma200": [
@@ -8305,128 +8290,124 @@
       {
         "time": "2026-11-26",
         "value": 25023.58
-      },
-      {
-        "time": "2026-11-27",
-        "value": 25002.82
       }
     ]
   },
   "ma_table": [
     {
       "period": "MA 20",
-      "value": 23419.3,
+      "value": 23449.28,
       "trend": "向下",
       "status": "跌破均線",
-      "diff_pct": -3.09
+      "diff_pct": -5.21
     },
     {
       "period": "MA 50",
-      "value": 23810.12,
+      "value": 23850.5,
       "trend": "向下",
       "status": "跌破均線",
-      "diff_pct": -4.68
+      "diff_pct": -6.81
     },
     {
       "period": "MA 100",
-      "value": 24545.44,
+      "value": 24560.49,
       "trend": "向下",
       "status": "跌破均線",
-      "diff_pct": -7.54
+      "diff_pct": -9.5
     },
     {
       "period": "MA 200",
-      "value": 25002.82,
+      "value": 25023.58,
       "trend": "向下",
       "status": "跌破均線",
-      "diff_pct": -9.23
+      "diff_pct": -11.18
     }
   ],
   "breadth": [
     {
       "name": "大盤綜合",
-      "ma20": 10.3,
-      "ma50": 55.2,
-      "ma100": 48.3,
-      "ma200": 41.4,
+      "ma20": 0.0,
+      "ma50": 0.0,
+      "ma100": 0.0,
+      "ma200": 0.0,
       "count": 29
     },
     {
       "name": "科技",
-      "ma20": 16.7,
-      "ma50": 33.3,
-      "ma100": 16.7,
+      "ma20": 0.0,
+      "ma50": 0.0,
+      "ma100": 0.0,
       "ma200": 0.0,
       "count": 6
     },
     {
       "name": "金融",
-      "ma20": 16.7,
-      "ma50": 50.0,
-      "ma100": 50.0,
-      "ma200": 33.3,
+      "ma20": 0.0,
+      "ma50": 0.0,
+      "ma100": 0.0,
+      "ma200": 0.0,
       "count": 6
     },
     {
       "name": "地產",
       "ma20": 0.0,
-      "ma50": 66.7,
-      "ma100": 50.0,
-      "ma200": 50.0,
+      "ma50": 0.0,
+      "ma100": 0.0,
+      "ma200": 0.0,
       "count": 6
     },
     {
       "name": "公用事業",
       "ma20": 0.0,
-      "ma50": 100.0,
-      "ma100": 100.0,
-      "ma200": 100.0,
+      "ma50": 0.0,
+      "ma100": 0.0,
+      "ma200": 0.0,
       "count": 5
     },
     {
       "name": "工商業",
-      "ma20": 16.7,
-      "ma50": 33.3,
-      "ma100": 33.3,
-      "ma200": 33.3,
+      "ma20": 0.0,
+      "ma50": 0.0,
+      "ma100": 0.0,
+      "ma200": 0.0,
       "count": 6
     }
   ],
   "rotation": [
     {
       "name": "科技",
-      "status": "Improving",
-      "chg_1d": 5.52,
-      "chg_5d": 2.85,
-      "chg_20d": -4.83
+      "status": "Lagging",
+      "chg_1d": NaN,
+      "chg_5d": NaN,
+      "chg_20d": NaN
     },
     {
       "name": "金融",
-      "status": "Improving",
-      "chg_1d": 0.53,
-      "chg_5d": 0.13,
-      "chg_20d": -1.1
+      "status": "Lagging",
+      "chg_1d": NaN,
+      "chg_5d": NaN,
+      "chg_20d": NaN
     },
     {
       "name": "地產",
       "status": "Lagging",
-      "chg_1d": 0.26,
-      "chg_5d": -0.53,
-      "chg_20d": -1.28
+      "chg_1d": NaN,
+      "chg_5d": NaN,
+      "chg_20d": NaN
     },
     {
       "name": "公用事業",
-      "status": "Weakening",
-      "chg_1d": -1.5,
-      "chg_5d": -1.96,
-      "chg_20d": 0.26
+      "status": "Lagging",
+      "chg_1d": NaN,
+      "chg_5d": NaN,
+      "chg_20d": NaN
     },
     {
       "name": "工商業",
       "status": "Lagging",
-      "chg_1d": 0.61,
-      "chg_5d": -1.45,
-      "chg_20d": -4.67
+      "chg_1d": NaN,
+      "chg_5d": NaN,
+      "chg_20d": NaN
     }
   ]
 }
